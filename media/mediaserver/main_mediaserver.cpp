@@ -27,7 +27,6 @@
 // from LOCAL_C_INCLUDES
 #ifdef NO_CAMERA_SERVER
 #include "CameraService.h"
-#include <hidl/HidlTransportSupport.h>
 #endif
 #include "IcuUtils.h"
 #include "MediaPlayerService.h"
