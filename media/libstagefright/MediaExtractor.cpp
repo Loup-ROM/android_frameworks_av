@@ -235,9 +235,6 @@ sp<MediaExtractor> MediaExtractor::CreateFromService(
     AString extractorName;
     if ((ret = AVFactory::get()->createExtendedExtractor(source, mime, meta)) != NULL) {
         ALOGI("Using extended extractor");
-    } else if (meta.get() && meta->findString("extended-extractor-use", &extractorName)
-            && (ret = FFMPEGSoftCodec::createExtractor(source, mime, meta)) != NULL) {
-        ALOGI("Use extended extractor for the special mime(%s) or codec", mime);
     } else if (!strcasecmp(mime, MEDIA_MIMETYPE_CONTAINER_MPEG4)
             || !strcasecmp(mime, "audio/mp4")) {
         ret = new MPEG4Extractor(source);
@@ -265,8 +262,6 @@ sp<MediaExtractor> MediaExtractor::CreateFromService(
         ret = new MPEG2PSExtractor(source);
     } else if (!strcasecmp(mime, MEDIA_MIMETYPE_AUDIO_MIDI)) {
         ret = new MidiExtractor(source);
-    } else if (!isDrm) {
-        ret = FFMPEGSoftCodec::createExtractor(source, mime, meta);
     }
 
     if (ret != NULL) {

@@ -1445,40 +1445,4 @@ status_t FFMPEGSoftCodec::setFFmpegAudioFormat(
             nodeID, (OMX_INDEXTYPE)OMX_IndexParamAudioFFmpeg, &param, sizeof(param));
 }
 
-void* FFMPEGSoftCodec::sLibHandle = NULL;
-
-void FFMPEGSoftCodec::loadPlugin() {
-    char lib[PROPERTY_VALUE_MAX];
-    if (!sLibHandle && property_get("media.sf.extractor-plugin", lib, NULL)) {
-        if ((sLibHandle = ::dlopen(lib, RTLD_LAZY)) != NULL) {
-            sSnifferFunc = (DataSource::SnifferFunc)dlsym(sLibHandle, "SniffFFMPEG");
-            sExtractorFunc = (CreateExtractorFunc)dlsym(sLibHandle, "CreateFFMPEGExtractor");
-        }
-        if (dlerror()) {
-            sSnifferFunc = NULL;
-            sExtractorFunc = NULL;
-            dlclose(sLibHandle);
-            ALOGE("Failed to load FFMPEG plugin: %s", dlerror());
-        }
-    }
-}
-
-DataSource::SnifferFunc FFMPEGSoftCodec::sSnifferFunc = NULL;
-
-DataSource::SnifferFunc FFMPEGSoftCodec::getSniffer() {
-    loadPlugin();
-    return sSnifferFunc;
-}
-
-FFMPEGSoftCodec::CreateExtractorFunc FFMPEGSoftCodec::sExtractorFunc = NULL;
-
-MediaExtractor* FFMPEGSoftCodec::createExtractor(const sp<DataSource> &source,
-        const char *mime, const sp<AMessage> &meta) {
-    loadPlugin();
-    if (sLibHandle == NULL) {
-        return NULL;
-    }
-    return sExtractorFunc(source, mime, meta);
-}
-
 }
